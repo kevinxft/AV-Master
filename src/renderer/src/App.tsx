@@ -34,16 +34,18 @@ const generateMenu = (root: string, folders: string[]): MenuItem[] => {
 function App(): JSX.Element {
   const navigate = useNavigate()
   const [menus, setMenus] = useState<MenuProps['items']>([])
+  const [imgs, setImgs] = useState([])
   useEffect(() => {
-    const lastOpened = localStorage.getItem('root') || 'root'
-    const getFolders = async () => {
+    const lastOpened = localStorage.getItem('root')
+    const getFolders = async (lastOpened = '') => {
       const result = await window.electron.ipcRenderer.invoke('traverse-folder', lastOpened)
       console.log(result)
       setMenus(generateMenu(lastOpened, result.folders))
+      setImgs(Array.from(result.covers.values()))
     }
 
     if (lastOpened) {
-      getFolders()
+      getFolders(lastOpened)
     } else {
       navigate('/welcome')
     }
@@ -67,7 +69,11 @@ function App(): JSX.Element {
             className="w-64 ml-auto"
           />
         </div>
-        <div className="flex-1 overflow-y-auto"></div>
+        <div className="flex-1 overflow-y-auto">
+          {imgs.map((img) => (
+            <img key={img} src={`local://${img}`} />
+          ))}
+        </div>
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
 import { ipcMain, dialog } from 'electron'
 import { exec } from 'child_process'
-import path from 'path'
+import path, { extname } from 'path'
 import fs from 'fs'
 import { AV_MASTER_COVERS_DIR, AV_MASTER_CONFIG_DIR } from './constants'
 

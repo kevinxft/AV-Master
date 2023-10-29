@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, protocol, net } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -16,7 +16,8 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      webSecurity: false
     }
   })
 
@@ -57,6 +58,11 @@ app.whenReady().then(() => {
   createWindow()
 
   initEvents(mainWindow)
+
+  protocol.handle('local', async (request) => {
+    const url = request.url.replace('local://', 'file://')
+    return net.fetch(url)
+  })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
