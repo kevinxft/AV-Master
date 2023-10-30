@@ -1,8 +1,9 @@
 import { ipcMain, dialog } from 'electron'
 import { exec } from 'child_process'
-import path, { extname } from 'path'
+import path from 'path'
+import { getPureName, getCover } from './utils'
 import fs from 'fs'
-import { AV_MASTER_COVERS_DIR, AV_MASTER_CONFIG_DIR } from './constants'
+import { AV_MASTER_COVERS_DIR, AV_MASTER_CONFIG_DIR, CUSTOM_PREFIX } from './constants'
 
 const regex = /\.(mkv|mp4|avi)$/i
 const covers = new Map()
@@ -42,17 +43,31 @@ function traverse(dir, videos: string[] = []) {
   })
 
   return {
-    videos,
-    covers,
+    videos: formatVideos(videos, covers),
     folders: [...folders]
   }
 }
 
+const formatVideos = (videoPaths: string[], covers) => {
+  const result: {
+    name: string
+    path: string
+    cover?: string
+  }[] = []
+  for (const path of videoPaths) {
+    const name = getPureName(path)
+    result.push({
+      name,
+      path,
+      cover: covers.has(name) ? `${CUSTOM_PREFIX}://${covers.get(name)}` : ''
+    })
+  }
+  return result
+}
+
 const processCovers = (folder: string) => {
-  console.log(folder)
   fs.readdirSync(folder).forEach((file) => {
-    const fileName = file.replace('.jpg', '')
-    console.log(fileName)
+    const fileName = getPureName(file)
     covers.set(fileName, path.join(folder, file))
   })
 }
@@ -65,16 +80,11 @@ export const initEvents = (mainWindow) => {
         dialog
           .showOpenDialog(mainWindow, { properties: ['openDirectory'] })
           .then((result) => {
+            console.log(result)
             if (!result.canceled) {
-              initData()
-              const path = result.filePaths[0]
-              const all = traverse(path)
-              return resolve({
-                ...all,
-                rootPath: path
-              })
+              return resolve(result.filePaths[0])
             }
-            return resolve([])
+            return resolve('')
           })
           .catch((e) => {
             console.log(e)
@@ -83,22 +93,26 @@ export const initEvents = (mainWindow) => {
       })
   )
 
-  ipcMain.handle(
-    'traverse-folder',
-    async (event, path) =>
-      new Promise((resolve, reject) => {
-        try {
-          const all = traverse(path)
-          resolve(all)
-        } catch (error) {
-          console.error(error)
-          reject([])
-        }
-      })
-  )
+  ipcMain.handle('traverse-folder', async (event, path) => {
+    try {
+      initData()
+      const all = traverse(path)
+      return all
+    } catch (error) {
+      console.error(error)
+      return []
+    }
+  })
 
-  ipcMain.on('play', (videoPath) => {
+  ipcMain.handle('get-cover', async (event, code: string, rootPath: string) => {
+    const res = await getCover(code, rootPath)
+    console.log(res)
+    return res
+  })
+
+  ipcMain.on('play', (event, videoPath) => {
     console.log('play')
-    exec(`open -a iina`)
+    console.log(videoPath)
+    exec(`open -a iina ${videoPath}`)
   })
 }

@@ -3,6 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { initEvents } from './events'
+import { CUSTOM_PREFIX } from './constants'
 
 let mainWindow
 
@@ -59,8 +60,8 @@ app.whenReady().then(() => {
 
   initEvents(mainWindow)
 
-  protocol.handle('local', async (request) => {
-    const url = request.url.replace('local://', 'file://')
+  protocol.handle(CUSTOM_PREFIX, async (request) => {
+    const url = request.url.replace(`${CUSTOM_PREFIX}://`, 'file://')
     return net.fetch(url)
   })
 

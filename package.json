@@ -23,8 +23,12 @@
     "@ant-design/icons": "^5.2.6",
     "@electron-toolkit/preload": "^2.0.0",
     "@electron-toolkit/utils": "^2.0.0",
+    "@types/cheerio": "^0.22.33",
     "antd": "^5.10.2",
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
     "postcss-antd-fixes": "^0.2.0",
+    "react-intersection-observer": "^9.5.2",
     "zustand": "^4.4.4"
   },
   "devDependencies": {

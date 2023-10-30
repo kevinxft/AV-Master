@@ -1,17 +1,21 @@
 import { Button } from 'antd'
 import { FolderOpenOutlined } from '@ant-design/icons'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function Welcome(): JSX.Element {
   const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
   const onSelectFolder = async () => {
-    console.log('onSelectFolder')
-    console.log(window.electron)
     setLoading(true)
-    const result = await window.electron.ipcRenderer.invoke('select-folder')
+    const path = await window.electron.ipcRenderer.invoke('select-folder')
     setLoading(false)
-    console.log(result)
-    window.localStorage.setItem('root', result.rootPath)
+    if (path) {
+      window.localStorage.setItem('root', path)
+      navigate('/')
+    } else {
+      window.localStorage.removeItem('root')
+    }
   }
   return (
     <div className="grid h-screen bg-slate-600">
