@@ -5,8 +5,6 @@ import { ALL_KEY, LOVE_KEY, RECENT_KEY } from './constants'
 
 const LRU = new LRUCache()
 
-let count = 0
-
 export type VideoType = {
   path: string
   name: string
@@ -24,7 +22,6 @@ type ValueType = {
   current: string[]
   fullCover: boolean
   siderbar: boolean
-  testRefresh: number
 }
 
 type FunctionType = {
@@ -41,12 +38,10 @@ type FunctionType = {
   setLove: (name: string, remove?: boolean) => void
   setRecent: (name: string) => void
   clearRecent: () => void
-  setTestRefresh: () => void
 }
 
 const initState = {
   rootPath: '',
-  testRefresh: 0,
   videos: [],
   loves: [],
   recent: [],
@@ -84,7 +79,7 @@ export const filterVideos = (
   recent: string[]
 ): VideoType[] => {
   videos = filterByCurrent(videos, current, loves, recent)
-  console.log('filterVideos: ', count++)
+  console.log('filterVideos')
   if (query) {
     return videos.filter((video) => video.name.toUpperCase().includes(query.toUpperCase()))
   }
@@ -96,7 +91,6 @@ export const useStore = create<StateType>()(
   persist(
     (set, get) => ({
       ...initState,
-      setTestRefresh: () => set((state) => ({ testRefresh: state.testRefresh + 1 })),
       setVideos: (videos) => set({ videos }),
       setFolders: (folders) => set({ folders }),
       setRootPath: (rootPath) => set({ rootPath }),

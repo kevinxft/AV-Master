@@ -95,7 +95,7 @@ export const initEvents = (mainWindow: BrowserWindow) => {
       })
   )
 
-  ipcMain.handle('traverse-folder', async (event, path) => {
+  ipcMain.handle('traverse-folder', async (_, path) => {
     try {
       initData()
       const all = traverse(path)
@@ -106,16 +106,16 @@ export const initEvents = (mainWindow: BrowserWindow) => {
     }
   })
 
-  ipcMain.handle('get-cover', async (event, code: string, rootPath: string) => {
+  ipcMain.handle('get-cover', async (_, code: string, rootPath: string) => {
     const res = await getCover(code, rootPath)
     return res
   })
 
-  ipcMain.on('play', (event, videoPath) => {
+  ipcMain.on('play', (_, videoPath) => {
     exec(`open -a iina ${videoPath}`)
   })
 
-  ipcMain.on('sipder-cover', async (event, rootPath, folderName) => {
+  ipcMain.on('sipder-cover', async (_, rootPath, folderName) => {
     initData()
     let { videos } = traverse(rootPath)
     if (folderName) {

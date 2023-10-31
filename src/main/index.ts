@@ -17,8 +17,8 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false,
-      webSecurity: false
+      sandbox: false
+      // webSecurity: false
     }
   })
 
@@ -34,12 +34,17 @@ function createWindow(): void {
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    console.log(process.env['ELECTRON_RENDERER_URL'])
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    // Open the DevTools
+    mainWindow.webContents.openDevTools()
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    console.log('product')
+    const url = join(__dirname, '../renderer/index.html')
+    console.log(url)
+    mainWindow.loadFile(url)
+    //mainWindow.loadURL('https://www.google.com.hk/')
   }
-  // Open the DevTools
-  mainWindow.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished

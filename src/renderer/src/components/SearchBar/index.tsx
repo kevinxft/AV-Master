@@ -24,8 +24,6 @@ function SearchBar(): JSX.Element {
   const [spiderPecent, setSpiderPercent] = useState(0)
   const rootPath = useStore((state) => state.rootPath)
   const current = useStore((state) => state.current)
-  const setTestRefresh = useStore((state) => state.setTestRefresh)
-  const testRefresh = useStore((state) => state.testRefresh)
 
   const onSyncData = async () => {
     setLoading(true)
@@ -41,7 +39,7 @@ function SearchBar(): JSX.Element {
     let folderName = current[0]
     folderName = [ALL_KEY, LOVE_KEY, RECENT_KEY].includes(folderName) ? '' : folderName
     window.electron.ipcRenderer.send('sipder-cover', rootPath, folderName)
-    window.electron.ipcRenderer.on('spider-cover-progress', async (event, result) => {
+    window.electron.ipcRenderer.on('spider-cover-progress', async (_, result) => {
       setSpiderPercent(result.percent)
       if (result.done) {
         await refreshData()
@@ -93,8 +91,6 @@ function SearchBar(): JSX.Element {
           </Tooltip>
         )
       ) : null}
-      <Button onClick={setTestRefresh}>Test</Button>
-      {testRefresh}
       <Input.Search
         onSearch={(value) => setQuery(value)}
         placeholder="输入番号"
