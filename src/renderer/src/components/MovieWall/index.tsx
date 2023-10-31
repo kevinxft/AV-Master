@@ -1,4 +1,4 @@
-import { useStore } from '@renderer/common/useStore'
+import { useStore, filterVideos } from '@renderer/common/useStore'
 import MoviePost from '../MoviePost'
 import { useInView } from 'react-intersection-observer'
 import { FloatButton } from 'antd'
@@ -6,7 +6,11 @@ import { ToTopOutlined } from '@ant-design/icons'
 import { useRef } from 'react'
 
 function MovieWall(): JSX.Element {
+  const current = useStore((state) => state.current)
+  const query = useStore((state) => state.query)
   const videos = useStore((state) => state.videos)
+  const loves = useStore((state) => state.loves)
+  const recent = useStore((state) => state.recent)
   const fullCover = useStore((state) => state.fullCover)
   const { ref } = useInView({
     threshold: 0
@@ -29,7 +33,7 @@ function MovieWall(): JSX.Element {
             : 'min-[300px]:grid-cols-2 min-[550px]:grid-cols-3 min-[800px]:grid-cols-4 min-[1050px]:grid-cols-5 min-[1300px]:grid-cols-6 min-[1550px]:grid-cols-7 min-[1800px]:grid-cols-8 min-[2050px]:grid-cols-9 min-[2300px]:grid-cols-10 min-[2550px]:grid-cols-11 min-[2800px]:grid-cols-12'
         }`}
       >
-        {videos.map((video) => (
+        {filterVideos(videos, current[0], query, loves, recent).map((video) => (
           <MoviePost key={video.path} video={video} />
         ))}
       </div>

@@ -5,25 +5,15 @@ import { useStore } from '@renderer/common/useStore'
 import MovieWall from '@renderer/components/MovieWall'
 import SearchBar from '@renderer/components/SearchBar'
 import Siderbar from '@renderer/components/SiderBar'
-import { getLocalData } from '@renderer/common/utils'
 
 function App(): JSX.Element {
   const navigate = useNavigate()
-  const setVideos = useStore((state) => state.setVideos)
-  const setFolders = useStore((state) => state.setFolders)
-  const setRootPath = useStore((state) => state.setRootPath)
-
-  async function initData(directory) {
-    const result = await getLocalData(directory)
-    setVideos(result.videos)
-    setFolders(result.folders)
-    setRootPath(directory)
-  }
+  const initData = useStore((state) => state.initData)
+  const rootPath = useStore((state) => state.rootPath)
 
   useEffect(() => {
-    const directory = localStorage.getItem('root')
-    if (directory) {
-      initData(directory)
+    if (rootPath) {
+      initData(rootPath)
     } else {
       navigate('/welcome')
     }

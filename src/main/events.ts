@@ -1,11 +1,11 @@
-import { ipcMain, dialog } from 'electron'
+import { ipcMain, dialog, BrowserWindow } from 'electron'
 import { exec } from 'child_process'
 import path from 'path'
 import { getPureName, getCover } from './utils'
 import fs from 'fs'
 import { AV_MASTER_COVERS_DIR, AV_MASTER_CONFIG_DIR, CUSTOM_PREFIX } from './constants'
 
-const regex = /\.(mkv|mp4|avi)$/i
+const movieReg = /\.(mkv|mp4|avi)$/i
 const covers = new Map()
 const folders = new Set()
 
@@ -35,9 +35,12 @@ function traverse(dir, videos: string[] = []) {
         traverse(fullPath, videos)
       }
     } else {
-      // 是文件,进行处理
-      if (regex.test(fullPath)) {
-        videos.push(fullPath)
+      // 是视频文件,进行处理
+      if (movieReg.test(fullPath)) {
+        // 获取这种奇怪的前缀
+        if (!path.basename(fullPath).startsWith('._')) {
+          videos.push(fullPath)
+        }
       }
     }
   })
@@ -48,7 +51,7 @@ function traverse(dir, videos: string[] = []) {
   }
 }
 
-const formatVideos = (videoPaths: string[], covers) => {
+const formatVideos = (videoPaths: string[], covers: Map<string, string>) => {
   const result: {
     name: string
     path: string
@@ -72,7 +75,7 @@ const processCovers = (folder: string) => {
   })
 }
 
-export const initEvents = (mainWindow) => {
+export const initEvents = (mainWindow: BrowserWindow) => {
   ipcMain.handle(
     'select-folder',
     async () =>
@@ -80,7 +83,6 @@ export const initEvents = (mainWindow) => {
         dialog
           .showOpenDialog(mainWindow, { properties: ['openDirectory'] })
           .then((result) => {
-            console.log(result)
             if (!result.canceled) {
               return resolve(result.filePaths[0])
             }
@@ -106,13 +108,30 @@ export const initEvents = (mainWindow) => {
 
   ipcMain.handle('get-cover', async (event, code: string, rootPath: string) => {
     const res = await getCover(code, rootPath)
-    console.log(res)
     return res
   })
 
   ipcMain.on('play', (event, videoPath) => {
-    console.log('play')
-    console.log(videoPath)
     exec(`open -a iina ${videoPath}`)
+  })
+
+  ipcMain.on('sipder-cover', async (event, rootPath, folderName) => {
+    initData()
+    let { videos } = traverse(rootPath)
+    if (folderName) {
+      videos = videos.filter((video) => video.path.includes(folderName))
+    }
+    const noCoverVideos = videos.filter((v) => v.cover === '')
+    let count = 0
+    const total = noCoverVideos.length
+    for (const video of noCoverVideos) {
+      console.log(video.name)
+      await getCover(video.name, rootPath)
+      mainWindow.webContents.send('spider-cover-progress', {
+        percent: Math.ceil((count++ / total) * 100),
+        done: false
+      })
+    }
+    mainWindow.webContents.send('spider-cover-progress', { percent: 100, done: true })
   })
 }

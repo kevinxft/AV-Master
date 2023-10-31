@@ -5,7 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import { initEvents } from './events'
 import { CUSTOM_PREFIX } from './constants'
 
-let mainWindow
+let mainWindow: BrowserWindow
 
 function createWindow(): void {
   // Create the browser window.

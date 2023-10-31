@@ -8,22 +8,24 @@ import {
 import { Menu } from 'antd'
 import type { MenuProps } from 'antd'
 import { useStore } from '@renderer/common/useStore'
+import { KEY_TO_STR, ALL_KEY, LOVE_KEY, RECENT_KEY } from '@renderer/common/constants'
+import { formatTitle } from '@renderer/common/utils'
 
 const topMenus = [
   {
-    label: '全部',
-    key: 'ALL',
+    label: KEY_TO_STR[ALL_KEY],
+    key: ALL_KEY,
     icon: <DatabaseOutlined />
   },
   {
-    label: '最爱',
-    key: 'LIKE',
+    label: KEY_TO_STR[LOVE_KEY],
+    key: LOVE_KEY,
     danger: true,
     icon: <HeartFilled />
   },
   {
-    label: '最近',
-    key: 'RECENT',
+    label: KEY_TO_STR[RECENT_KEY],
+    key: RECENT_KEY,
     icon: <CalendarOutlined />
   }
 ]
@@ -49,6 +51,8 @@ export default function Siderbar(): JSX.Element {
   const showSiderbar = useStore((state) => state.siderbar)
   const folders = useStore((state) => state.folders)
   const rootPath = useStore((state) => state.rootPath)
+  const current = useStore((state) => state.current)
+  const setCurrent = useStore((state) => state.setCurrent)
   const [menus, setMenus] = useState<MenuProps['items']>([])
 
   useEffect(() => {
@@ -57,13 +61,30 @@ export default function Siderbar(): JSX.Element {
     }
   }, [folders, rootPath])
 
+  const onClick = ({ key }) => {
+    setCurrent([key])
+    document.title = formatTitle(key)
+  }
+
   return (
     <>
       {showSiderbar ? (
-        <div className="flex flex-col bg-white w-52">
-          <Menu mode="inline" items={topMenus} />
+        <div className="flex flex-col bg-white w-[180px]">
+          <Menu
+            onClick={onClick}
+            defaultSelectedKeys={current}
+            selectedKeys={current}
+            mode="vertical"
+            items={topMenus}
+          />
           <div className="overflow-y-auto">
-            <Menu mode="inline" items={menus}></Menu>
+            <Menu
+              onClick={onClick}
+              defaultSelectedKeys={current}
+              selectedKeys={current}
+              mode="inline"
+              items={menus}
+            ></Menu>
           </div>
         </div>
       ) : null}
