@@ -20,11 +20,13 @@ function App(): JSX.Element {
   }, [])
 
   return (
-    <div className="flex h-screen">
-      <Siderbar />
-      <div className="flex flex-col flex-1">
-        <SearchBar />
-        <MovieWall />
+    <div className="flex h-screen pt-5 cursor-pointer drag">
+      <div className="flex flex-1 no-drag">
+        <Siderbar />
+        <div className="flex flex-col flex-1">
+          <SearchBar />
+          <MovieWall />
+        </div>
       </div>
     </div>
   )

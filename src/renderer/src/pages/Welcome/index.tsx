@@ -18,9 +18,9 @@ function Welcome(): JSX.Element {
     }
   }
   return (
-    <div className="grid h-screen bg-slate-600">
+    <div className="grid h-screen bg-slate-600 drag">
       <Button
-        className="m-auto bg-slate-400"
+        className="m-auto bg-slate-400 no-drag"
         type="primary"
         onClick={onSelectFolder}
         icon={<FolderOpenOutlined />}

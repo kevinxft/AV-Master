@@ -14,6 +14,11 @@ function createWindow(): void {
     height: 670,
     show: false,
     autoHideMenuBar: true,
+    titleBarStyle: 'customButtonsOnHover',
+    titleBarOverlay: {
+      color: '#fff',
+      symbolColor: '#fff'
+    },
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
