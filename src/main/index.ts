@@ -18,7 +18,6 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
-      // webSecurity: false
     }
   })
 
@@ -34,16 +33,12 @@ function createWindow(): void {
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    console.log(process.env['ELECTRON_RENDERER_URL'])
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
     // Open the DevTools
     mainWindow.webContents.openDevTools()
   } else {
-    console.log('product')
     const url = join(__dirname, '../renderer/index.html')
-    console.log(url)
     mainWindow.loadFile(url)
-    //mainWindow.loadURL('https://www.google.com.hk/')
   }
 }
 
@@ -53,6 +48,15 @@ function createWindow(): void {
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
+
+  // session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+  //   callback({
+  //     responseHeaders: {
+  //       ...details.responseHeaders,
+  //       'Content-Security-Policy': ['*']
+  //     }
+  //   })
+  // })
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

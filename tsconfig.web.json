@@ -14,9 +14,6 @@
       "@renderer/*": [
         "src/renderer/src/*"
       ],
-      "@common/*": [
-        "src/renderer/src/common/*"
-      ]
     }
   }
 }
