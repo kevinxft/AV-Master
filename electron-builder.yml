@@ -1,5 +1,5 @@
 appId: com.electron.app
-productName: av-master
+productName: AV Master
 directories:
   buildResources: build
 files:
