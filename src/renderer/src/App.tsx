@@ -21,10 +21,10 @@ function App(): JSX.Element {
   }, [])
 
   return (
-    <div className="flex h-screen pt-5 cursor-pointer drag">
+    <div className="flex h-screen cursor-pointer pt-7 drag">
       <div className="relative flex flex-1 no-drag">
         <div
-          className={`w-[200px] absolute transition-all ease-in-out ${
+          className={`w-[200px] absolute transition-all ease-in-out h-full ${
             showSiderbar ? 'left-0' : 'left-[-200px]'
           }`}
         >
