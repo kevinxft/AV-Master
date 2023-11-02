@@ -48,7 +48,6 @@ const generateMenu = (root: string, folders: string[]): MenuItem[] => {
 }
 
 export default function Siderbar(): JSX.Element {
-  const showSiderbar = useStore((state) => state.siderbar)
   const folders = useStore((state) => state.folders)
   const rootPath = useStore((state) => state.rootPath)
   const current = useStore((state) => state.current)
@@ -67,27 +66,23 @@ export default function Siderbar(): JSX.Element {
   }
 
   return (
-    <>
-      {showSiderbar ? (
-        <div className="flex flex-col bg-white w-[180px]">
-          <Menu
-            onClick={onClick}
-            defaultSelectedKeys={current}
-            selectedKeys={current}
-            mode="vertical"
-            items={topMenus}
-          />
-          <div className="overflow-y-auto">
-            <Menu
-              onClick={onClick}
-              defaultSelectedKeys={current}
-              selectedKeys={current}
-              mode="inline"
-              items={menus}
-            ></Menu>
-          </div>
-        </div>
-      ) : null}
-    </>
+    <div className="flex flex-col h-full bg-white">
+      <Menu
+        onClick={onClick}
+        defaultSelectedKeys={current}
+        selectedKeys={current}
+        mode="vertical"
+        items={topMenus}
+      />
+      <div className="flex-1 overflow-y-auto">
+        <Menu
+          onClick={onClick}
+          defaultSelectedKeys={current}
+          selectedKeys={current}
+          mode="inline"
+          items={menus}
+        ></Menu>
+      </div>
+    </div>
   )
 }

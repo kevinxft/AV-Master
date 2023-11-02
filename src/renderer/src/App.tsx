@@ -10,6 +10,7 @@ function App(): JSX.Element {
   const navigate = useNavigate()
   const initData = useStore((state) => state.initData)
   const rootPath = useStore((state) => state.rootPath)
+  const showSiderbar = useStore((state) => state.siderbar)
 
   useEffect(() => {
     if (rootPath) {
@@ -21,9 +22,19 @@ function App(): JSX.Element {
 
   return (
     <div className="flex h-screen pt-5 cursor-pointer drag">
-      <div className="flex flex-1 no-drag">
-        <Siderbar />
-        <div className="flex flex-col flex-1">
+      <div className="relative flex flex-1 no-drag">
+        <div
+          className={`w-[200px] absolute transition-all ease-in-out ${
+            showSiderbar ? 'left-0' : 'left-[-200px]'
+          }`}
+        >
+          <Siderbar />
+        </div>
+        <div
+          className={`absolute h-full flex flex-col flex-1 transition-all ease-in-out right-0 ${
+            showSiderbar ? 'left-[200px]' : 'left-0'
+          }`}
+        >
           <SearchBar />
           <MovieWall />
         </div>
