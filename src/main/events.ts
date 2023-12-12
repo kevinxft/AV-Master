@@ -16,6 +16,10 @@ const makerFolder = (path) => {
   }
 }
 
+const getMTime = (dir) => {
+  return new Date(fs.statSync(dir).mtime).getTime()
+}
+
 const initData = () => {
   covers.clear()
   folders.clear()
@@ -55,6 +59,7 @@ const formatVideos = (videoPaths: string[], covers: Map<string, string>) => {
   const result: {
     name: string
     path: string
+    mtime: number
     cover?: string
   }[] = []
   for (const path of videoPaths) {
@@ -62,6 +67,7 @@ const formatVideos = (videoPaths: string[], covers: Map<string, string>) => {
     result.push({
       name,
       path,
+      mtime: getMTime(path),
       cover: covers.has(name) ? `${CUSTOM_PREFIX}://${covers.get(name)}` : ''
     })
   }

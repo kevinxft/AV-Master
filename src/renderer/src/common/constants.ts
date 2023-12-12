@@ -2,6 +2,8 @@ export const ALL_KEY = '__AV_MASTER_ALL__'
 export const LOVE_KEY = '__AV_MASTER_LOVE__'
 export const RECENT_KEY = '__AV_MASTER_RECENT__'
 
+export const FAVORITE_SYMBOL = '__AV_MASTER_FAVORITE_SYMBOL_'
+
 export const KEY_TO_STR = {
   [ALL_KEY]: '全部',
   [LOVE_KEY]: '我喜欢',

@@ -1,89 +1,63 @@
 import { create } from 'zustand'
-import { getLocalData, LRUCache } from './utils'
+import { getLocalData } from './utils'
 import { persist } from 'zustand/middleware'
-import { ALL_KEY, LOVE_KEY, RECENT_KEY } from './constants'
-
-const LRU = new LRUCache()
+import { FAVORITE_SYMBOL } from '@renderer/common/constants'
 
 export type VideoType = {
   path: string
   name: string
+  mtime: number
   cover?: string
 }
 
 type ValueType = {
   rootPath: string
   videos: VideoType[]
-  loves: string[]
-  recent: string[]
+  favorites: string[]
+  search: string[]
   covers: Map<string, string>
   folders: string[]
-  query: string
-  current: string[]
   fullCover: boolean
-  siderbar: boolean
 }
 
 type FunctionType = {
   setVideos: (videos: VideoType[]) => void
   setFolders: (folders: string[]) => void
   setRootPath: (rootPath: string) => void
-  setCurrent: (current: string[]) => void
-  setQuery: (query: string) => void
+  setSearch: (search: string[]) => void
   toggleCover: () => void
-  toggleSiderbar: () => void
   initData: (directory?: string) => void
   refreshData: () => void
   resetData: () => void
-  setLove: (name: string, remove?: boolean) => void
-  setRecent: (name: string) => void
-  clearRecent: () => void
+  setFavorite: (name: string, remove?: boolean) => void
 }
 
 const initState = {
   rootPath: '',
+  search: [],
   videos: [],
-  loves: [],
-  recent: [],
+  favorites: [],
   covers: new Map(),
   folders: [],
-  query: '',
-  current: [ALL_KEY],
-  fullCover: true,
-  siderbar: true
-}
-
-const filterByCurrent = (
-  videos: VideoType[],
-  current: string,
-  loves: string[],
-  recent: string[]
-): VideoType[] => {
-  if (current === ALL_KEY) {
-    return videos
-  }
-  if (current === LOVE_KEY) {
-    return videos.filter((video) => loves.includes(video.name))
-  } else if (current === RECENT_KEY) {
-    return videos.filter((video) => recent.includes(video.name))
-  } else {
-    return (videos = videos.filter((video) => video.path.includes(current)))
-  }
+  fullCover: false
 }
 
 export const filterVideos = (
   videos: VideoType[],
-  current: string,
-  query: string,
-  loves: string[],
-  recent: string[]
+  search: string[],
+  favorites: string[]
 ): VideoType[] => {
-  videos = filterByCurrent(videos, current, loves, recent)
-  console.log('filterVideos')
-  if (query) {
-    return videos.filter((video) => video.name.toUpperCase().includes(query.toUpperCase()))
+  const result = videos.slice().sort((a, b) => b.mtime - a.mtime)
+  if (search.length === 0) {
+    return result
   }
-  return videos
+  if (search.includes(FAVORITE_SYMBOL)) {
+    return result.filter((video) => favorites.includes(video.name))
+  } else {
+    return result.filter((video) =>
+      search.some((tag) => video.path.toLocaleLowerCase().includes(tag.toLocaleLowerCase()))
+    )
+  }
 }
 
 type StateType = ValueType & FunctionType
@@ -93,31 +67,17 @@ export const useStore = create<StateType>()(
       ...initState,
       setVideos: (videos) => set({ videos }),
       setFolders: (folders) => set({ folders }),
+      setSearch: (search) => set({ search }),
       setRootPath: (rootPath) => set({ rootPath }),
-      setCurrent: (current) => set({ current }),
-      setQuery: (query) => set({ query }),
-      setLove: (name, remove = false) =>
+      setFavorite: (name, remove = false) =>
         set((state) => {
           if (remove) {
-            return { loves: state.loves.filter((lv) => lv !== name) }
+            return { favorites: state.favorites.filter((lv) => lv !== name) }
           } else {
-            return { loves: [...state.loves, name] }
+            return { favorites: [...state.favorites, name] }
           }
         }),
-      setRecent: (name: string) =>
-        set((state) => {
-          state.recent.forEach((r) => {
-            LRU.set(r, r)
-          })
-          LRU.set(name, name)
-          return { recent: [...state.recent, name] }
-        }),
-      clearRecent: () => set({ recent: [] }),
       toggleCover: () => set((state) => ({ fullCover: !state.fullCover })),
-      toggleSiderbar: () =>
-        set((state) => {
-          return { siderbar: !state.siderbar }
-        }),
       initData: async (directory) => {
         if (directory) {
           const result = await getLocalData(directory)
